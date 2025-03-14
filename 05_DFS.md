@@ -1,169 +1,79 @@
-## **Depth First Search (DFS) - Complete Theory & Code Example in Java**
+**Graph DFS Traversal**
 
-### **What is DFS?**
-Depth First Search (DFS) is a fundamental graph traversal algorithm used to explore all vertices of a graph. It starts from a given source node and explores as deep as possible along each branch before backtracking.
+### **Problem Statement**
+Given an undirected graph represented as an adjacency list, perform a Depth-First Search (DFS) traversal starting from node `0` and return the order of visited nodes.
 
-### **Types of Graph Representation**
-DFS can be implemented using:
-1. **Adjacency Matrix** (2D array representation)  
-2. **Adjacency List** (Array of Lists) – More efficient for sparse graphs.
-
-### **DFS Algorithm Steps**
-1. Start from the given node (source).
-2. Mark it as visited.
-3. Explore its adjacent (neighboring) nodes recursively.
-4. Backtrack if there are no unvisited adjacent nodes.
-
-### **DFS Implementation Approaches**
-- **Recursive Approach** (Uses function call stack)
-- **Iterative Approach** (Uses an explicit stack)
+#### **GFG Question Link**
+[DFS of Graph - GeeksforGeeks](https://www.geeksforgeeks.org/depth-first-search-or-dfs-for-a-graph/)
 
 ---
 
-## **1. DFS Recursive Implementation (Adjacency List)**
+### **Approach**
+1. **Initialize Data Structures:**
+   - Create a boolean array `visited[]` to keep track of visited nodes.
+   - Create a list `ls` to store the DFS traversal order.
+
+2. **Perform DFS Recursively:**
+   - Mark the current node as visited.
+   - Add the current node to the traversal list.
+   - Recur for all adjacent nodes that have not been visited.
+
+3. **Return the Traversal Order:**
+   - Once all nodes have been visited, return the `ls` list.
+
+---
+
+### **Code Implementation (Java)**
 ```java
 import java.util.*;
 
-class Graph {
-    private int V; // Number of vertices
-    private List<List<Integer>> adjList;
-
-    public Graph(int V) {
-        this.V = V;
-        adjList = new ArrayList<>();
-        for (int i = 0; i < V; i++) {
-            adjList.add(new ArrayList<>());
-        }
+class Solution {
+    // Function to return a list containing the DFS traversal of the graph.
+    public ArrayList<Integer> dfsOfGraph(ArrayList<ArrayList<Integer>> adj) {
+        ArrayList<Integer> ls = new ArrayList<>();
+        boolean[] visited = new boolean[adj.size()];
+        
+        // Start DFS from node 0
+        dfs(ls, visited, adj, 0);
+        
+        return ls;
     }
-
-    // Add an edge to the graph
-    public void addEdge(int u, int v) {
-        adjList.get(u).add(v);
-        adjList.get(v).add(u); // For undirected graph
-    }
-
-    // DFS recursive function
-    private void dfsHelper(int node, boolean[] visited) {
-        visited[node] = true;
-        System.out.print(node + " ");
-
-        for (int neighbor : adjList.get(node)) {
-            if (!visited[neighbor]) {
-                dfsHelper(neighbor, visited);
+    
+    private void dfs(ArrayList<Integer> ls, boolean[] visited, ArrayList<ArrayList<Integer>> adj, int node) {
+        visited[node] = true; // Mark node as visited
+        ls.add(node); // Add node to traversal list
+        
+        for (int x : adj.get(node)) {
+            if (!visited[x]) {
+                dfs(ls, visited, adj, x); // Recursive DFS call
             }
         }
     }
-
-    // DFS traversal
-    public void dfs(int startNode) {
-        boolean[] visited = new boolean[V];
-        System.out.println("DFS Traversal:");
-        dfsHelper(startNode, visited);
-    }
-
-    public static void main(String[] args) {
-        Graph g = new Graph(6);
-        g.addEdge(0, 1);
-        g.addEdge(0, 2);
-        g.addEdge(1, 3);
-        g.addEdge(1, 4);
-        g.addEdge(2, 5);
-
-        g.dfs(0);
-    }
 }
 ```
-**Output:**
-```
-DFS Traversal:
-0 1 3 4 2 5 
-```
 
 ---
 
-## **2. DFS Iterative Implementation (Using Stack)**
-```java
-import java.util.*;
+### **Time Complexity Analysis**
+- Each node is visited once: **O(V)**
+- Each edge is traversed once in an undirected graph: **O(E)**
+- **Total Time Complexity:** **O(V + E)**
 
-class Graph {
-    private int V;
-    private List<List<Integer>> adjList;
-
-    public Graph(int V) {
-        this.V = V;
-        adjList = new ArrayList<>();
-        for (int i = 0; i < V; i++) {
-            adjList.add(new ArrayList<>());
-        }
-    }
-
-    public void addEdge(int u, int v) {
-        adjList.get(u).add(v);
-        adjList.get(v).add(u); // For undirected graph
-    }
-
-    public void dfsIterative(int startNode) {
-        boolean[] visited = new boolean[V];
-        Stack<Integer> stack = new Stack<>();
-        stack.push(startNode);
-
-        System.out.println("DFS Traversal:");
-        while (!stack.isEmpty()) {
-            int node = stack.pop();
-            if (!visited[node]) {
-                System.out.print(node + " ");
-                visited[node] = true;
-
-                // Push neighbors in reverse order for correct DFS order
-                List<Integer> neighbors = adjList.get(node);
-                Collections.reverse(neighbors);
-                for (int neighbor : neighbors) {
-                    if (!visited[neighbor]) {
-                        stack.push(neighbor);
-                    }
-                }
-            }
-        }
-    }
-
-    public static void main(String[] args) {
-        Graph g = new Graph(6);
-        g.addEdge(0, 1);
-        g.addEdge(0, 2);
-        g.addEdge(1, 3);
-        g.addEdge(1, 4);
-        g.addEdge(2, 5);
-
-        g.dfsIterative(0);
-    }
-}
-```
-**Output:**
-```
-DFS Traversal:
-0 2 5 1 4 3 
-```
+### **Space Complexity Analysis**
+- `visited[]` array takes **O(V)** space.
+- Recursive call stack takes **O(V)** space in the worst case (if the graph is a single long path).
+- **Total Space Complexity:** **O(V)** (excluding input storage)
 
 ---
 
-## **Applications of DFS**
-- **Finding Connected Components**
-- **Detecting Cycles in a Graph**
-- **Topological Sorting (DAG)**
-- **Path Finding (Maze solving, Navigation)**
-- **Solving Puzzles (Sudoku, N-Queens)**
+### **Edge Cases Considered**
+- A graph with no edges.
+- A graph with disconnected components (though the function assumes connectivity from node `0`).
+- A complete graph where each node is connected to every other node.
 
----
+### **Summary**
+- DFS is implemented recursively.
+- The time complexity is **O(V + E)**.
+- The space complexity is **O(V)** due to the recursion stack.
+- Works efficiently for sparse and dense graphs with proper memory management.
 
-## **DFS Problems on LeetCode & GeeksforGeeks**
-### **LeetCode:**
-1. [Number of Islands](https://leetcode.com/problems/number-of-islands/)
-2. [Course Schedule](https://leetcode.com/problems/course-schedule/)
-3. [Pacific Atlantic Water Flow](https://leetcode.com/problems/pacific-atlantic-water-flow/)
-
-### **GeeksforGeeks:**
-1. [Depth First Search (DFS) for a Graph](https://www.geeksforgeeks.org/depth-first-search-or-dfs-for-a-graph/)
-2. [Connected Components in an Undirected Graph](https://www.geeksforgeeks.org/connected-components-in-an-undirected-graph/)
-3. [Detect Cycle in a Directed Graph](https://www.geeksforgeeks.org/detect-cycle-in-a-directed-graph-using-dfs/)
-
-Let me know if you need further explanations! 🚀
