@@ -1,86 +1,82 @@
-# **Number of Islands (BFS Approach)**
+# **Number of Islands using BFS**
 
-## **Problem Statement**
-Given a 2D grid map of **'1' (land)** and **'0' (water)**, return the number of islands. An island is surrounded by water and is formed by connecting adjacent lands **horizontally, vertically, or diagonally**. You may assume that all four edges of the grid are all surrounded by water.
+### **Problem Statement**
+Given a **2D grid** consisting of `'1'` (land) and `'0'` (water), find the number of **islands**. An island is formed by connecting adjacent lands **horizontally or vertically**, and it is completely surrounded by water.
 
----
+#### **LeetCode Question Link**
+[Number of Islands - LeetCode](https://leetcode.com/problems/number-of-islands/)
 
-## **Approach Used: Breadth-First Search (BFS)**
-### **Concepts Used**
-1. **Graph Representation:** The given grid is treated as a graph where each **'1' (land)** is a node, and adjacent land nodes are connected.
-2. **BFS Traversal:** We use BFS to explore all connected components of land, marking them as visited.
-3. **Connected Components Counting:** Each BFS traversal represents discovering a new island, and we increment the island count accordingly.
+#### **GitHub Repository (Example Implementation)**
+[GitHub - Number of Islands BFS](https://github.com/your-repo/num-islands-bfs) *(Replace with actual repo if available)*
 
 ---
 
-## **Algorithm**
-1. Create a **visited[][]** boolean array to track visited cells.
-2. Traverse the grid using a nested loop.
-3. If a cell contains **'1'** (land) and hasn't been visited:
-   - Perform **BFS traversal** from that cell.
-   - Mark all connected land cells as visited.
-   - Increment the island count.
-4. BFS explores adjacent cells **(up, down, left, right, and diagonals)** until all connected land cells are marked.
+### **Approach**
+1. **Initialize a Visited Matrix:**
+   - Use a boolean `visited[][]` array to track visited land cells.
+
+2. **Iterate Through Each Cell:**
+   - If a cell contains `'1'` (land) and is **not visited**, it is part of a new island.
+   - Increment the **island count** and perform **BFS** to mark all connected land cells as visited.
+
+3. **Breadth-First Search (BFS) Traversal:**
+   - Use a **queue** to process adjacent land cells.
+   - Move in all **4 possible directions** (up, down, left, right).
+   - If a neighboring cell is `'1'` and unvisited, mark it visited and add it to the queue.
+
+4. **Return the Total Island Count.**
 
 ---
 
-## **Implementation (Java)**
+### **Code Implementation (Java)**
 ```java
 import java.util.*;
 
 class Solution {
+    class Pair {
+        int x;
+        int y;
+        Pair(int x, int y) {
+            this.x = x;
+            this.y = y;
+        }
+    }
+    
     public int numIslands(char[][] grid) {
         boolean[][] visited = new boolean[grid.length][grid[0].length];
-        int islandCount = 0;
-
+        int count = 0;
+        
         for (int i = 0; i < grid.length; i++) {
             for (int j = 0; j < grid[0].length; j++) {
-                if (grid[i][j] == '1' && !visited[i][j]) {
-                    bfs(grid, visited, new Coordinate(i, j));
-                    islandCount++;
+                if (!visited[i][j] && grid[i][j] == '1') {
+                    count++;
+                    bfs(i, j, visited, grid);
                 }
             }
         }
-        return islandCount;
+        return count;
     }
-
-    // Helper class to store x, y coordinates
-    class Coordinate {
-        int row, col;
-        Coordinate(int row, int col) {
-            this.row = row;
-            this.col = col;
-        }
-    }
-
-    void bfs(char[][] grid, boolean[][] visited, Coordinate start) {
-        Queue<Coordinate> queue = new ArrayDeque<>();
-        queue.add(start);
-        visited[start.row][start.col] = true;
-
-        for (int row = -1; row <= 1; row++) {
-            for (int col = -1; col <= 1; col++) {
-                if (row == 0 && col == 0) continue; // Skip the current cell
-
-                int[] rowDirection = {-1, 0, 1, 0, -1, -1, 1, 1};
-                int[] colDirection = {0, -1, 0, 1, -1, 1, -1, 1};
-
-                while (!queue.isEmpty()) {
-                    Coordinate current = queue.poll();
-                    int x = current.row, y = current.col;
-
-                    for (int d = 0; d < 8; d++) {
-                        int xCh = x + rowDirection[d];
-                        int yCh = y + colDirection[d];
-
-                        if (xCh >= 0 && xCh < grid.length && 
-                            yCh >= 0 && yCh < grid[0].length && 
-                            grid[xCh][yCh] == '1' && !visited[xCh][yCh]) {
-                            
-                            visited[xCh][yCh] = true;
-                            queue.add(new Coordinate(xCh, yCh));
-                        }
-                    }
+    
+    public void bfs(int startX, int startY, boolean[][] visited, char[][] grid) {
+        Queue<Pair> queue = new ArrayDeque<>();
+        queue.add(new Pair(startX, startY));
+        visited[startX][startY] = true;
+        
+        int[] rowDir = {-1, 1, 0, 0};
+        int[] colDir = {0, 0, -1, 1};
+        
+        while (!queue.isEmpty()) {
+            Pair myPair = queue.poll();
+            int sr = myPair.x;
+            int sc = myPair.y;
+            
+            for (int i = 0; i < 4; i++) {
+                int x = sr + rowDir[i];
+                int y = sc + colDir[i];
+                
+                if (x >= 0 && x < grid.length && y >= 0 && y < grid[0].length && !visited[x][y] && grid[x][y] == '1') {
+                    queue.add(new Pair(x, y));
+                    visited[x][y] = true;
                 }
             }
         }
@@ -90,59 +86,29 @@ class Solution {
 
 ---
 
-## **Explanation of Code**
-### **1. BFS Traversal**
-- We use **a queue** to explore connected land cells.
-- When a **'1' (land)** is found, BFS starts, marking all reachable land cells as visited.
+### **Time Complexity Analysis**
+- **Iterating through the grid:** **O(N × M)** (where `N` is rows and `M` is columns)
+- **BFS Traversal:** **O(N × M)** (Each cell is visited once in the worst case)
+- **Total Time Complexity:** **O(N × M)**
 
-### **2. Coordinate Class**
-- A **helper class `Coordinate`** stores `(row, col)` for easy referencing in the BFS queue.
-
-### **3. Traversing Adjacent Cells**
-- The **nested loop** iterates over 8 directions **(up, down, left, right, and diagonals)**.
-
-### **4. Time Complexity Analysis**
-- Each cell is **visited once**, so the **time complexity is O(N×M)**, where `N` is rows and `M` is columns.
-- **Space Complexity:** O(N×M) due to the **visited[][] array** and BFS queue.
+### **Space Complexity Analysis**
+- **Visited array:** **O(N × M)**
+- **Queue (Worst Case - Entire Grid is an Island):** **O(N × M)**
+- **Total Space Complexity:** **O(N × M)**
 
 ---
 
-## **Example Walkthrough**
-### **Input Grid:**
-```
-11000
-11000
-00100
-00011
-```
-### **Step-by-Step Execution:**
-1. Start at `(0,0)`, run BFS → Mark connected **land cells**.
-2. Find next unvisited **'1'**, run BFS → Discover new island.
-3. Repeat until all **land cells are processed**.
+### **Edge Cases Considered**
+- A grid with **no land** (all `'0'`).
+- A grid where **each cell is an island** (every `'1'` is separate).
+- A **large single island** covering the entire grid.
+- A **sparse island grid** with isolated clusters.
 
-### **Output:**
-```
-Number of islands: 3
-```
+### **Summary**
+- BFS is used to explore all connected land cells efficiently.
+- Time complexity is **O(N × M)**.
+- Space complexity is **O(N × M)** due to the queue and visited array.
+- Works well for moderate grid sizes but may require optimizations for very large inputs.
 
----
-
-## **Edge Cases Considered**
-✅ Single-row or single-column grid.
-✅ No islands (all water).
-✅ All land (one big island).
-✅ Large grid sizes to test performance.
-
----
-
-### **Additional Resources**
-For more insights, refer to: [GeeksforGeeks - Find the Number of Islands](https://www.geeksforgeeks.org/problems/find-the-number-of-islands/)
-
----
-
-### **Final Thoughts**
-- **Breadth-First Search (BFS) ensures we visit each island component once, making it optimal for this problem.**
-- **Using a queue prevents recursion depth issues that might arise with DFS in large grids.**
-
-🚀 **Now you have a fully optimized solution with detailed explanations!**
+Would you like an optimized **DFS** version as well? 🚀
 
